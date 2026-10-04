@@ -1,4 +1,5 @@
 _build/
+.vscode/
 tools/
 source/
 exports/
