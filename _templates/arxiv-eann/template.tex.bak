@@ -1,0 +1,170 @@
+\documentclass{article}
+\usepackage{arxiv}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{datetime}       % show dates in the title block
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{doi}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{newunicodechar}
+\usepackage{caption}
+\usepackage[most]{tcolorbox}
+% Status badges: \bPub{Published} \bPrep{In preparation} \bHyp{Hypothesis} \bSpec{Speculative}
+\definecolor{bgPub}{HTML}{E3F4E5}\definecolor{fgPub}{HTML}{1E7B34}
+\definecolor{bgPrep}{HTML}{FDEBD8}\definecolor{fgPrep}{HTML}{B35C00}
+\definecolor{bgHyp}{HTML}{E1ECFA}\definecolor{fgHyp}{HTML}{1F5FAD}
+\definecolor{bgSpec}{HTML}{FBE3E3}\definecolor{fgSpec}{HTML}{B3261E}
+\newcommand{\tagbadge}[3]{\tcbox[on line, colback=#1, colframe=#2, boxrule=0.45pt, arc=2.2pt, left=2.2pt, right=2.2pt, top=0.6pt, bottom=0.6pt, boxsep=0pt, nobeforeafter, tcbox raise base]{\fontsize{7}{8}\selectfont\sffamily\bfseries\color{#2}\MakeUppercase{#3}}}
+\newcommand{\bPub}[1]{\tagbadge{bgPub}{fgPub}{#1}}
+\newcommand{\bPrep}[1]{\tagbadge{bgPrep}{fgPrep}{#1}}
+\newcommand{\bHyp}[1]{\tagbadge{bgHyp}{fgHyp}{#1}}
+\newcommand{\bSpec}[1]{\tagbadge{bgSpec}{fgSpec}{#1}}
+\newcommand{\tagnote}[1]{{\small\color{black!55}#1}}
+\setcounter{secnumdepth}{0} % section numbers are written into the headings
+% Unicode symbols that appear in running text (pdfLaTeX-safe)
+\newunicodechar{μ}{\ensuremath{\mu}}
+\newunicodechar{ν}{\ensuremath{\nu}}
+\newunicodechar{ψ}{\ensuremath{\psi}}
+\newunicodechar{γ}{\ensuremath{\gamma}}
+\newunicodechar{λ}{\ensuremath{\lambda}}
+\newunicodechar{σ}{\ensuremath{\sigma}}
+\newunicodechar{ω}{\ensuremath{\omega}}
+\newunicodechar{ε}{\ensuremath{\varepsilon}}
+\newunicodechar{θ}{\ensuremath{\theta}}
+\newunicodechar{α}{\ensuremath{\alpha}}
+\newunicodechar{ρ}{\ensuremath{\rho}}
+\newunicodechar{η}{\ensuremath{\eta}}
+\newunicodechar{π}{\ensuremath{\pi}}
+\newunicodechar{Ξ}{\ensuremath{\Xi}}
+\newunicodechar{Ω}{\ensuremath{\Omega}}
+\newunicodechar{Λ}{\ensuremath{\Lambda}}
+\newunicodechar{Σ}{\ensuremath{\Sigma}}
+\newunicodechar{∂}{\ensuremath{\partial}}
+\newunicodechar{√}{\ensuremath{\surd}}
+\newunicodechar{−}{\ensuremath{-}}
+\newunicodechar{±}{\ensuremath{\pm}}
+\newunicodechar{·}{\ensuremath{\cdot}}
+\newunicodechar{½}{\ensuremath{\tfrac{1}{2}}}
+\newunicodechar{²}{\ensuremath{^{2}}}
+\newunicodechar{″}{\ensuremath{''}}
+\newunicodechar{₀}{\ensuremath{_{0}}}
+\newunicodechar{ᵀ}{\ensuremath{^{\top}}}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\newunicodechar{≪}{\ensuremath{\ll}}
+\newunicodechar{→}{\ensuremath{\rightarrow}}
+\newunicodechar{⇒}{\ensuremath{\Rightarrow}}
+\newunicodechar{ł}{\l{}}
+\newunicodechar{ę}{\k{e}}
+
+[- IMPORTS -]
+
+\hypersetup{colorlinks = true,
+linkcolor = purple,
+urlcolor  = blue,
+citecolor = cyan,
+anchorcolor = black}
+
+\title{[-doc.title-]}
+
+[# if options.show_date #]
+\newdate{articleDate}{[-doc.date.day-]}{[-doc.date.month-]}{[-doc.date.year-]}
+\date{\displaydate{articleDate}}
+[# else #]
+\date{}
+[# endif #]
+
+\makeatletter
+\let\@fnsymbol\@arabic
+\makeatother
+
+\author{[# for author in doc.authors #]
+[# if author.orcid #]\href{https://orcid.org/[-author.orcid-]}{\includegraphics[scale=0.06]{orcid.pdf}}\hspace{1mm}[# endif #]
+[--author.name--]
+[# if author.corresponding #]
+\footnotemark[[-author.corresponding.index-]]
+[#- endif #]\\
+[# for affiliation in author.affiliations #][-affiliation.value.name-]\\
+[# if affiliation.value.department #][-affiliation.value.department-]\\[# endif #]
+[# if affiliation.value.institution #][-affiliation.value.institution-]\\[# endif #][# endfor #]
+[# if not loop.last #]
+\AND
+[# endif #]
+[# endfor #]
+}
+
+% Uncomment to override  the `A preprint' in the header
+\renewcommand{\headeright}{[-doc.subject-]}
+\renewcommand{\undertitle}{[-doc.subtitle-]}
+\renewcommand{\shorttitle}{[-doc.short_title-]}
+
+%% Add PDF metadata to help others organize their library
+%% Once the PDF is generated, you can check the metadata with
+%% $ pdfinfo template.pdf
+\hypersetup{
+pdftitle={\@title},
+pdfsubject={[-doc.description-]},
+pdfauthor={\@author},
+pdfkeywords={[-doc.keywords-]},
+addtopdfcreator={Written in Curvenote}
+}
+
+\raggedbottom
+\begin{document}
+\maketitle
+[# if options.contributor_list #]
+{\centering\small\vspace{-0.6em}
+\textbf{Contributors:} [-options.contributor_list-]\par\vspace{0.25em}
+[# if options.commenter_list #]\textbf{Commenters and advisors} (listing does not imply endorsement): [-options.commenter_list-]\par
+[# endif #]\vspace{0.4em}}
+[# endif #]
+[# for author in doc.authors #]
+[# if author.corresponding #]
+\footnotetext[[-author.corresponding.index-]]{Correspondence to: [-author.email-]}
+[# endif #]
+[# endfor #]
+
+[# if parts.abstract #]
+\vspace{0.2em}
+\begin{abstract}
+[-parts.abstract-]
+\end{abstract}
+[# endif #]
+
+
+[# if options.title_figure #]
+\vspace{0.4em}
+{\centering
+\includegraphics[width=\textwidth,height=[# if options.title_figure_height #][-options.title_figure_height-][# else #]0.38\textheight[# endif #],keepaspectratio]{[-options.title_figure-]}\par
+\label{fig-programme}\par}
+\clearpage
+[# endif #]
+
+[-CONTENT-]
+
+[# if parts.acknowledgments #]
+\section*{Acknowledgments}
+[-parts.acknowledgments-]
+[# endif #]
+
+[# if options.link #]
+\section*{Original article}
+\footnotesize
+This article is available online at the following URL: \href{[-options.link-]}{[-options.link-]}
+\normalsize
+[# endif #]
+
+[# if doc.bibliography #]
+\bibliographystyle{unsrtnat}
+\bibliography{[- doc.bibliography | join(", ") -]}
+[# endif #]
+
+\end{document}

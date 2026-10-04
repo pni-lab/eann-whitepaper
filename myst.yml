@@ -1,0 +1,45 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  id: entropic-attractor-networks-whitepaper
+  title: "Entropic attractor networks: a scale-agnostic, first-principles route to inference and learning in brains and machines"
+  short_title: Entropic attractor networks
+  description: >-
+    White paper for a research programme on entropic attractor networks (eANNs):
+    a first-principles, scale-agnostic route to inference and learning in brains and machines.
+  keywords:
+    - attractor networks
+    - inference and learning
+    - first principles
+    - large-scale brain dynamics
+    - fMRI
+    - continual learning
+    - thermodynamic computing
+  authors:
+    - name: Tamas Spisak
+      email: tamas.spisak@uk-essen.de
+      corresponding: true
+      affiliations:
+        - pnl
+        - ude
+  affiliations:
+    - id: pnl
+      name: Predictive Neuroscience Lab, Center for Translational Neuro- and Behavioral Sciences
+    - id: ude
+      name: University Medicine Essen, University of Duisburg-Essen
+  license: CC-BY-4.0
+  banner: figures/banner.png   # transparent PNG: works on light and dark backgrounds (article-theme only)
+  # github: https://github.com/<user>/<repo>   # set once the repository exists
+  date: 2026-10-03
+  numbering:
+    headings: false   # section numbers are written into the headings
+    figure: true
+    equation: false
+  toc:
+    - file: whitepaper.md
+site:
+  template: article-theme
+  options:
+    logo_text: Entropic attractor networks
+    style: ./style.css
+    hide_footer_links: true

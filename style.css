@@ -1,0 +1,34 @@
+/* Status badges for claims: [Published] [In preparation] [Hypothesis] [Speculative] */
+.tag {
+  display: inline-block;
+  padding: 0 0.45em;
+  margin: 0 0.1em;
+  border: 1px solid currentColor;
+  border-radius: 0.3em;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  vertical-align: 0.12em;
+  white-space: nowrap;
+}
+.tag-published      { color: #1E7B34; background: #E3F4E5; }
+.tag-in-preparation { color: #B35C00; background: #FDEBD8; }
+.tag-hypothesis     { color: #1F5FAD; background: #E1ECFA; }
+.tag-speculative    { color: #B3261E; background: #FBE3E3; }
+.tag-note { color: #6b7280; font-size: 0.85em; }
+
+/* Banner (myst.yml: project.banner, article-theme). The PNG is transparent, so the page colour shows
+   through in both themes; in dark mode the lines are lifted slightly so they glow instead of fading. */
+/* Scale the banner to the full width (never crop it); it fades out at the bottom, so any header height works. */
+.myst-article-header-background { background-size: 100% auto !important; background-position: top center !important; }
+html.dark .myst-article-header-background { filter: brightness(1.35) saturate(1.1); }
+
+/* Status badges in dark mode */
+html.dark .tag-published      { color: #7BD88F; background: #12301A; }
+html.dark .tag-in-preparation { color: #F5B26B; background: #3A230C; }
+html.dark .tag-hypothesis     { color: #8DB8F2; background: #102A4A; }
+html.dark .tag-speculative    { color: #F08A84; background: #3D1210; }
+html.dark .tag-note { color: #9ca3af; }
