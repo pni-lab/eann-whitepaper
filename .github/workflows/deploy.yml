@@ -38,8 +38,22 @@ jobs:
             texlive-xetex texlive-latex-extra texlive-fonts-recommended \
             texlive-science lmodern latexmk
 
+      - name: Cache MyST downloads (DOI metadata, templates)
+        uses: actions/cache@v4
+        with:
+          path: _build/cache
+          key: myst-cache-${{ hashFiles('whitepaper.md', 'references.bib') }}
+          restore-keys: myst-cache-
+
       - name: Build PDF (arXiv style, one column)
-        run: myst build --pdf
+        run: |
+          myst build --pdf
+          if [ ! -f exports/whitepaper.pdf ]; then
+            echo "::error::MyST did not produce exports/whitepaper.pdf. Diagnostics follow."
+            echo "--- LaTeX log (last 80 lines) ---"
+            tail -n 80 _build/temp/*/whitepaper.log 2>/dev/null || echo "(no LaTeX log: the export failed before LaTeX ran, see the MyST output above)"
+            exit 1
+          fi
 
       - name: Build website
         run: myst build --html

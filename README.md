@@ -3,6 +3,12 @@
 *A scale-agnostic, first-principles route to inference and learning in brains and machines.*
 Tamas Spisak, Predictive Neuroscience Lab, University Medicine Essen, University of Duisburg-Essen.
 
+### White paper:
+
+- html: https://pni-lab.github.io/eann-whitepaper/
+
+- pdf: https://raw.githubusercontent.com/pni-lab/eann-whitepaper/main/exports/whitepaper.pdf
+
 This repository builds the white paper with [MyST](https://mystmd.org) into
 
 - a website (GitHub Pages), and
