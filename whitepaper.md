@@ -18,6 +18,8 @@ downloads:
     title: PDF (arXiv style)
 ---
 
+[**DOI: 10.5281/zenodo.23187669**](https://zenodo.org/account/settings/github/repository/pni-lab/eann-whitepaper) [**PDF version**](https://raw.githubusercontent.com/pni-lab/eann-whitepaper/main/exports/whitepaper.pdf)
+
 +++ {"no-tex": true, "no-pdf": true}
 
 ```{figure} figures/fig1.png
