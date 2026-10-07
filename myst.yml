@@ -30,7 +30,7 @@ project:
   license: CC-BY-4.0
   banner: figures/banner.png   # transparent PNG: works on light and dark backgrounds (article-theme only)
   # github: https://github.com/<user>/<repo>   # set once the repository exists
-  date: 2026-10-03
+  date: 2026-10-07
   numbering:
     headings: false   # section numbers are written into the headings
     figure: true

@@ -1,6 +1,7 @@
 _build/
 .vscode/
-tools/
+tools/*
+!tools/build.py
 source/
 node_modules/
 .DS_Store
