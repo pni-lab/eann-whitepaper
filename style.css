@@ -32,3 +32,6 @@ html.dark .tag-in-preparation { color: #F5B26B; background: #3A230C; }
 html.dark .tag-hypothesis     { color: #8DB8F2; background: #102A4A; }
 html.dark .tag-speculative    { color: #F08A84; background: #3D1210; }
 html.dark .tag-note { color: #9ca3af; }
+
+/* Paragraphs that hold only PDF-only raw LaTeX (e.g. \tablecolumns) render empty on the web */
+p:empty { display: none; }

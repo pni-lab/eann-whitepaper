@@ -2,6 +2,7 @@ _build/
 .vscode/
 tools/*
 !tools/build.py
+!tools/mystdocs.py
 source/
 node_modules/
 .DS_Store

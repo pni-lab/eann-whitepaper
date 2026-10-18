@@ -68,6 +68,7 @@ files:
   - template.tex
   - arxiv.sty
   - orcid.pdf
+  - plainnat-eann.bst
 packages:
   - caption
   - tcolorbox
@@ -85,6 +86,9 @@ packages:
   - graphicx
   - hyperref
   - inputenc
+  - array
+  - longtable
+  - etoolbox
   - lmodern
   - microtype
   - natbib

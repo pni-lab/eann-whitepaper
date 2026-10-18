@@ -68,6 +68,78 @@
 
 [- IMPORTS -]
 
+%% ---------------------------------------------------------------------------
+%% PDF layout fixes for the eANN white paper. MyST writes boxes (admonitions)
+%% as `framed`, tables as `tabular` with equal p-columns, and figures with
+%% width=\linewidth. The definitions below make all three page-safe, so the
+%% PDF stays clean whenever it is regenerated, without post-processing.
+%% ---------------------------------------------------------------------------
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{etoolbox}
+\makeatletter
+% Boxes: breakable, lightly shaded (the `framed` package leaves empty frames
+% when a box breaks after a table, and cannot break inside one).
+\@ifundefined{framed}{\newenvironment{framed}{}{}}{}
+\newif\ifeann@inbox
+\renewenvironment{framed}{%
+  \eann@inboxtrue
+  \tcolorbox[enhanced, breakable, colback=black!3, colframe=black!28,
+    boxrule=0.5pt, arc=1.5pt, left=8pt, right=8pt, top=6pt, bottom=6pt,
+    before skip=12pt, after skip=12pt,
+    before upper={\setlength{\parskip}{5.5pt}\setlength{\parindent}{0pt}}]%
+  \def\bigskip{\par\nopagebreak\medskip}% keeps a box's title with a table below it
+  \clubpenalty=10000 % and with the first lines of its text
+}{\endtcolorbox}
+% Tables: ragged-right cells in a smaller font with booktabs rules. Outside
+% boxes they become longtables, which break across pages and repeat their
+% header row. Column widths default to MyST's equal split; a raw LaTeX line
+% \tablecolumns{0.06,0.40,0.22,0.32} just before a table sets relative widths.
+\def\eann@nextwidths{}
+\newcommand{\tablecolumns}[1]{\gdef\eann@nextwidths{#1}}
+\newcommand{\eann@cellfmt}{\raggedright\arraybackslash\hspace{0pt}}
+\def\eann@addcol#1{\expandafter\def\expandafter\eann@spec\expandafter{\eann@spec>{\eann@cellfmt}p{#1}}}
+\def\eann@conv#1#2{\ifx\eann@stop#1\else\eann@addcol{#2}\expandafter\eann@conv\fi}
+\def\eann@addw#1{\eann@addcol{\dimexpr #1\linewidth-2\tabcolsep\relax}}
+\def\eann@fromwidths#1{\@for\eann@w:=#1\do{\expandafter\eann@addw\expandafter{\eann@w}}}
+\def\eann@buildspec#1{%
+  \def\eann@spec{}%
+  \ifx\eann@nextwidths\@empty
+    \eann@conv#1\eann@stop\eann@stop
+  \else
+    \expandafter\eann@fromwidths\expandafter{\eann@nextwidths}%
+    \gdef\eann@nextwidths{}%
+  \fi}
+\let\eann@tabular\tabular
+\let\eann@endtabular\endtabular
+\setlength{\LTpre}{2pt}
+\setlength{\LTpost}{2pt}
+\def\eann@pagetabular#1{%
+  \eann@buildspec{#1}%
+  \small\renewcommand{\arraystretch}{1.15}%
+  \ifeann@inbox
+    \let\hline\midrule
+    \let\eann@next\eann@tabular
+  \else
+    \def\LT@hline{\midrule\endhead}% longtable maps \hline to \LT@hline
+    \let\eann@next\longtable
+  \fi
+  \expandafter\eann@next\expandafter{\eann@spec}}
+\def\eann@pageendtabular{\ifeann@inbox\expandafter\eann@endtabular\else\expandafter\endlongtable\fi}
+% switched on after \maketitle (the title block uses tabular itself)
+\newcommand{\EannPageSafeTables}{\let\tabular\eann@pagetabular\let\endtabular\eann@pageendtabular}
+% Figures: never taller than 55% of the text height, so that a figure and its
+% caption always fit on one page; captions in a smaller font.
+\NewCommandCopy{\eann@includegraphics}{\includegraphics}
+\def\eann@figuregraphics{%
+  \renewcommand{\includegraphics}[2][]{\eann@includegraphics[height=0.55\textheight,keepaspectratio,##1]{##2}}}
+\AtBeginEnvironment{figure}{\eann@figuregraphics}
+\captionsetup[figure]{font=small}
+% References: smaller, tighter
+\renewcommand{\bibfont}{\small}
+\setlength{\bibsep}{2.5pt plus 1pt}
+\makeatother
+
 \hypersetup{colorlinks = true,
 linkcolor = purple,
 urlcolor  = blue,
@@ -111,9 +183,9 @@ anchorcolor = black}
 %% Once the PDF is generated, you can check the metadata with
 %% $ pdfinfo template.pdf
 \hypersetup{
-pdftitle={\@title},
-pdfsubject={[-doc.description-]},
-pdfauthor={\@author},
+pdftitle={[-doc.title-]},
+pdfsubject={[# if doc.description #][-doc.description-][# else #][-doc.subtitle-][# endif #]},
+pdfauthor={[# for author in doc.authors #][-author.name-][# if not loop.last #], [# endif #][# endfor #]},
 pdfkeywords={[-doc.keywords-]},
 addtopdfcreator={Written in Curvenote}
 }
@@ -121,6 +193,7 @@ addtopdfcreator={Written in Curvenote}
 \raggedbottom
 \begin{document}
 \maketitle
+\EannPageSafeTables
 [# if options.contributor_list #]
 {\centering\small\vspace{-0.6em}
 \textbf{Contributors:} [-options.contributor_list-]\par\vspace{0.25em}
@@ -144,8 +217,10 @@ addtopdfcreator={Written in Curvenote}
 [# if options.title_figure #]
 \vspace{0.4em}
 {\centering
-\includegraphics[width=\textwidth,height=[# if options.title_figure_height #][-options.title_figure_height-][# else #]0.34\textheight[# endif #],keepaspectratio]{[-options.title_figure-]}\par
-\label{fig-programme}\par}
+\includegraphics[width=\textwidth,height=[# if options.title_figure_height #][-options.title_figure_height-][# elif options.title_figure_caption #]0.30\textheight[# else #]0.34\textheight[# endif #],keepaspectratio]{[-options.title_figure-]}\par
+\label{fig-programme}\par
+[# if options.title_figure_caption #]\vspace{0.3em}{\small\itshape [-options.title_figure_caption-]\par}
+[# endif #]}
 \clearpage
 [# endif #]
 
@@ -164,7 +239,7 @@ This article is available online at the following URL: \href{[-options.link-]}{[
 [# endif #]
 
 [# if doc.bibliography #]
-\bibliographystyle{plainnat}
+\bibliographystyle{plainnat-eann}
 \bibliography{[- doc.bibliography | join(", ") -]}
 [# endif #]
 

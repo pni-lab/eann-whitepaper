@@ -3,6 +3,7 @@ version: 1
 project:
   id: entropic-attractor-networks-whitepaper
   title: "Entropic attractor networks: a scale-agnostic, first-principles route to inference and learning in brains and machines"
+  subtitle: "White Paper v0.9.2 (draft)"
   short_title: Entropic attractor networks
   description: >-
     White paper for a research programme on entropic attractor networks (eANNs):
@@ -16,9 +17,12 @@ project:
     - continual learning
     - thermodynamic computing
   authors:
-    - name: White Paper by Tamas Spisak
+    - name: Tamas Spisak
       email: tamas.spisak@uk-essen.de
       corresponding: true
+      twitter: spisaktamas
+      url: https://pni-lab.github.io/
+      github: pni-lab
       affiliations:
         - pnl
         - ude
@@ -28,6 +32,10 @@ project:
     - id: ude
       name: University Medicine Essen, University of Duisburg-Essen
   license: CC-BY-4.0
+  doi: 10.5281/zenodo.23187669
+  downloads: 
+    - file: exports/whitepaper.pdf
+      title: Download as PDF
   banner: figures/banner.png   # transparent PNG: works on light and dark backgrounds (article-theme only)
   # github: https://github.com/<user>/<repo>   # set once the repository exists
   date: 2026-10-07
@@ -43,3 +51,4 @@ site:
     logo_text: Entropic attractor networks
     style: ./style.css
     hide_footer_links: true
+    outline_maxdepth: 1
