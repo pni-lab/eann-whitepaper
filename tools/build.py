@@ -16,7 +16,10 @@ For the PDF, this script writes a transformed copy into _build/pdf/ in which
     (*<title>*), becomes "Appendix X (*<title>*)"; a box that is not
     mentioned anywhere leaves a short pointer at its original place;
   * the author name "White Paper by <name>" (used on the website, where it
-    tells readers what the page is) becomes just "<name>".
+    tells readers what the page is) becomes just "<name>";
+  * section and figure cross-references, written as links "[Section 4.2](#sec-4-2)"
+    or "[Figure 2A](#fig-rules)", become LaTeX hyperlinks that keep their text
+    (MyST's own LaTeX export drops the link and replaces the text with its template).
 It then runs `myst build --pdf` there and copies the result to
 exports/whitepaper.pdf. The source files are never modified.
 
@@ -111,7 +114,19 @@ def to_pdf_markdown(text):
         appendix.extend(inner)
     body = body.rstrip() + "\n" + "\n".join(appendix) + "\n"
     body = re.sub(r"\n{3,}", "\n\n", body)
+    body = pdf_crossrefs(body)
     return body, [(l, b[2]) for l, b in zip(letters, blocks)]
+
+
+XREF = re.compile(r"\[([^\[\]\n`]+)\]\(#((?:sec|fig)-[\w-]+)\)")
+
+
+def pdf_crossrefs(text):
+    def rep(m):
+        label = m.group(1).replace("Section ", "Section~").replace("Figure ", "Figure~")
+        return "{raw:latex}`\\hyperref[%s]{%s}`" % (m.group(2), label)
+
+    return XREF.sub(rep, text)
 
 
 def pdf_myst_yml(text):

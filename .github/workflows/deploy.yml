@@ -47,11 +47,11 @@ jobs:
 
       - name: Build PDF (arXiv style, one column)
         run: |
-          myst build --pdf
+          python3 tools/build.py pdf   # moves appendix boxes to the end, keeps cross-reference links
           if [ ! -f exports/whitepaper.pdf ]; then
             echo "::error::MyST did not produce exports/whitepaper.pdf. Diagnostics follow."
             echo "--- LaTeX log (last 80 lines) ---"
-            tail -n 80 _build/temp/*/whitepaper.log 2>/dev/null || echo "(no LaTeX log: the export failed before LaTeX ran, see the MyST output above)"
+            tail -n 80 _build/pdf/_build/temp/*/whitepaper.log 2>/dev/null || echo "(no LaTeX log: the export failed before LaTeX ran, see the MyST output above)"
             exit 1
           fi
 

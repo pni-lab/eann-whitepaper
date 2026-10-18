@@ -150,9 +150,9 @@ anchorcolor = black}
 
 [# if options.show_date #]
 \newdate{articleDate}{[-doc.date.day-]}{[-doc.date.month-]}{[-doc.date.year-]}
-\date{\displaydate{articleDate}}
+\date{\displaydate{articleDate}[# if doc.doi #]\quad\textperiodcentered\quad\textbf{DOI:} \href{https://doi.org/[-doc.doi-]}{[-doc.doi-]}[# endif #]}
 [# else #]
-\date{}
+\date{[# if doc.doi #]\textbf{DOI:} \href{https://doi.org/[-doc.doi-]}{[-doc.doi-]}[# endif #]}
 [# endif #]
 
 \makeatletter
@@ -193,12 +193,13 @@ addtopdfcreator={Written in Curvenote}
 \raggedbottom
 \begin{document}
 \maketitle
+\enlargethispage{2\baselineskip}% a little more room for the title figure
 \EannPageSafeTables
 [# if options.contributor_list #]
-{\centering\small\vspace{-0.6em}
+{\centering\small\vspace{-0.9em}
 \textbf{Contributors:} [-options.contributor_list-]\par\vspace{0.25em}
 [# if options.commenter_list #]\textbf{Commenters and advisors} (listing does not imply endorsement): [-options.commenter_list-]\par
-[# endif #]\vspace{0.4em}}
+[# endif #]\vspace{0.2em}}
 [# endif #]
 [# for author in doc.authors #]
 [# if author.corresponding #]
@@ -207,7 +208,6 @@ addtopdfcreator={Written in Curvenote}
 [# endfor #]
 
 [# if parts.abstract #]
-\vspace{0.2em}
 \begin{abstract}
 [-parts.abstract-]
 \end{abstract}
@@ -215,12 +215,19 @@ addtopdfcreator={Written in Curvenote}
 
 
 [# if options.title_figure #]
-\vspace{0.4em}
-{\centering
-\includegraphics[width=\textwidth,height=[# if options.title_figure_height #][-options.title_figure_height-][# elif options.title_figure_caption #]0.30\textheight[# else #]0.34\textheight[# endif #],keepaspectratio]{[-options.title_figure-]}\par
-\label{fig-programme}\par
+\par\vspace{0.1em}
+% The title figure takes the space left on the title page (at most title_figure_height),
+% so it never spills onto page 2, whatever the fonts and TeX version do to the text above.
+\newlength{\eannTitleFigHeight}
+\setlength{\eannTitleFigHeight}{\dimexpr\pagegoal-\pagetotal-0.6\baselineskip\relax}
+\ifdim\eannTitleFigHeight>[# if options.title_figure_height #][-options.title_figure_height-][# else #]0.34\textheight[# endif #]\relax
+  \setlength{\eannTitleFigHeight}{[# if options.title_figure_height #][-options.title_figure_height-][# else #]0.34\textheight[# endif #]}%
+\fi
+\noindent\begin{minipage}{\textwidth}\centering
+\includegraphics[width=\textwidth,height=\eannTitleFigHeight,keepaspectratio]{[-options.title_figure-]}\par
+\label{fig-programme}
 [# if options.title_figure_caption #]\vspace{0.3em}{\small\itshape [-options.title_figure_caption-]\par}
-[# endif #]}
+[# endif #]\end{minipage}
 \clearpage
 [# endif #]
 

@@ -27,6 +27,8 @@ Conventions in the doc (readable while editing, reversible):
     "***Figure N. Title.***". The image's alt text selects the file through
     FIGURES below (alt-text prefix -> (file, label)); the "Figure N." prefix is
     dropped, since MyST numbers figures itself, in order of appearance.
+  * Section and figure references ("Section 4.2", "Figures 2C and 5A") are plain
+    text in the doc and MyST cross-references in whitepaper.md (see link_refs).
   * PDF column widths for tables (a line "{raw:latex}`\\tablecolumns{...}`" just
     before a table in whitepaper.md) are not shown in the doc. from-docs puts
     them back before the table with the same header row; if a header row was
@@ -101,6 +103,104 @@ def url_of(key):
     return (BIBURL + key) if not key.startswith("10.") else DOIURL + key
 
 
+
+# ---------------------------------------------------------------- cross-references
+# In whitepaper.md, "Section 4.2" and "Figure 2A" are MyST cross-references:
+# headings carry targets "(sec-4-2)=", and references are links "[Section 4.2](#sec-4-2)",
+# "Sections [4.3](#sec-4-3)–[4.5](#sec-4-5)", "[Figure 2A](#fig-rules)". In the doc they are
+# plain text; from-docs links them again (figure numbers follow the order of the figures).
+
+NUM = r"\d+(?:\.\d+)?[A-Z]?"
+SEP = r"(?:\s*,\s*|\s+and\s+|\s*–\s*|\s+to\s+)"
+REF_RE = re.compile(r"\b(Sections?|Figures?)(\s+)(%s(?:%s%s)*)" % (NUM, SEP, NUM))
+HEAD_RE = re.compile(r"^(#{2,3}) (\d+(?:\.\d+)?)\.? ", re.M)
+XLINK_RE = re.compile(r"\[([^\[\]\n]*)\]\(#(?:sec|fig)-[\w-]+\)")
+
+
+def sec_label(num):
+    return "sec-" + num.replace(".", "-")
+
+
+def add_section_targets(text):
+    out = []
+    for line in text.split("\n"):
+        m = HEAD_RE.match(line)
+        if m and not (out and re.match(r"^\(sec-[\w-]+\)=$", out[-1])):
+            out.append("(%s)=" % sec_label(m.group(2)))
+        out.append(line)
+    return "\n".join(out)
+
+
+def figure_labels(text):
+    """Figure number -> label, in order of the numbered figures."""
+    labels, n = {}, 0
+    for m in re.finditer(r"^```\{figure\}[^\n]*\n((?::[\w-]+:[^\n]*\n)*)", text, re.M):
+        opts = m.group(1)
+        if ":enumerated: false" in opts:
+            continue
+        lab = re.search(r"^:label:\s*(\S+)", opts, re.M)
+        n += 1
+        if lab:
+            labels[str(n)] = lab.group(1)
+    return labels
+
+
+def _link_segment(seg, sections, figs):
+    def rep(m):
+        kind, space, body = m.group(1), m.group(2), m.group(3)
+        parts = re.split("(%s)" % SEP, body)
+
+        def target(tok):
+            if kind.startswith("Section"):
+                return sec_label(tok) if tok in sections else None
+            return figs.get(re.match(r"\d+", tok).group(0))
+
+        if len(parts) == 1:
+            t = target(body)
+            return "[%s%s%s](#%s)" % (kind, space, body, t) if t else m.group(0)
+        out = [kind, space]
+        for i, tok in enumerate(parts):
+            t = target(tok) if i % 2 == 0 else None
+            out.append("[%s](#%s)" % (tok, t) if t else tok)
+        return "".join(out)
+
+    return REF_RE.sub(rep, seg)
+
+
+PROTECT = re.compile(r"(`[^`\n]*`|\[[^\]\n]*\]\([^)\n]*\)|<[^>\n]*>)")
+
+
+def link_refs(text):
+    """Turn plain 'Section 4.2' / 'Figure 2A' into MyST cross-references (idempotent)."""
+    sections = {m.group(2) for m in HEAD_RE.finditer(text)}
+    figs = figure_labels(text)
+    out, fence = [], None
+    for line in text.split("\n"):
+        st = line.lstrip()
+        if fence:
+            if st.startswith("```") and st.strip() == "```":
+                fence = None
+                out.append(line)
+                continue
+            if fence != "figure" or re.match(r"^:[\w-]+:", st):
+                out.append(line)
+                continue
+        elif st.startswith("```"):
+            fence = "figure" if st.startswith("```{figure}") else "code"
+            out.append(line)
+            continue
+        if line.startswith("#") or re.match(r"^\(.*\)=$", line):
+            out.append(line)
+            continue
+        pieces = PROTECT.split(line)
+        out.append("".join(p if i % 2 else _link_segment(p, sections, figs) for i, p in enumerate(pieces)))
+    return "\n".join(out)
+
+
+def unlink_refs(text):
+    text = re.sub(r"^\(sec-[\w-]+\)=\n", "", text, flags=re.M)
+    return XLINK_RE.sub(r"\1", text)
+
 # ---------------------------------------------------------------- MyST -> doc
 
 
@@ -170,6 +270,7 @@ COLWIDTHS = re.compile(r"\{raw:latex\}`(\\tablecolumns\{[^}\n]*\})`\n\n?(?=(\|[^
 
 def body_to_docs(body, lab, boxes):
     body = COLWIDTHS.sub("", body)
+    body = unlink_refs(body)
     lines = admonitions(body.split("\n"), lab, boxes)
     text = "\n".join(lines)
     text = text.replace("```{math}", "```latex")
@@ -186,7 +287,7 @@ def to_docs(src, outdir):
     abstract = re.search(r"^abstract: \|\n((?:  .*\n)+)", fm, re.M).group(1)
     abstract = " ".join(l.strip() for l in abstract.splitlines())
     lines = rest.split("\n")
-    start = next(i for i, l in enumerate(lines) if l.startswith("## ") or re.match(r"^:{3,}\{admonition\}", l))
+    start = next(i for i, l in enumerate(lines) if l.startswith("## ") or re.match(r"^:{3,}\{admonition\}", l) or re.match(r"^\(sec-[\w-]+\)=$", l))
     end = len(lines)
     while end > 0 and (lines[end - 1].startswith("%") or not lines[end - 1].strip()):
         end -= 1
@@ -353,7 +454,7 @@ def from_docs(main_md, boxes_md, dst):
     cur = Path(dst).read_text()
     fm, rest = split_frontmatter(cur)
     lines = rest.split("\n")
-    start = next(i for i, l in enumerate(lines) if l.startswith("## ") or re.match(r"^:{3,}\{admonition\}", l))
+    start = next(i for i, l in enumerate(lines) if l.startswith("## ") or re.match(r"^:{3,}\{admonition\}", l) or re.match(r"^\(sec-[\w-]+\)=$", l))
     end = len(lines)
     while end > 0 and (lines[end - 1].startswith("%") or not lines[end - 1].strip()):
         end -= 1
@@ -378,6 +479,7 @@ def from_docs(main_md, boxes_md, dst):
 
     body = re.sub(r"^\\?\[Box:\s*(.+?)\\?\]\s*$", box, body, flags=re.M)
     body = restore_colwidths(body, cur)
+    body = link_refs(add_section_targets(body))
 
     if title:
         fm = re.sub(r'^title:\s*".*"\s*$', "title: " + json.dumps(title, ensure_ascii=False), fm, count=1, flags=re.M)

@@ -36,6 +36,7 @@ Edit `whitepaper.md` directly, or edit the text in Claude Docs and convert it ba
 
 - **Reference boxes.** Long reference material (about this document, setting and notation, desiderata, intellectual lineage) sits in admonitions with `:class: dropdown appendix`. On the website they are collapsed dropdowns where they stand. In the PDF they are moved to the end as Appendix A, B, ... in order of appearance. To refer to such a box in the text, write its title in italics, exactly as in the box (`*Setting, notation and the assumption–result map*`); in the PDF this becomes "Appendix B (*Setting, ...*)". A box that is not mentioned leaves a one-line pointer in the PDF. Use four colons (`::::`) for these boxes so that they can contain other directives.
 - **PDF layout.** The template makes MyST's LaTeX output page-safe, so `myst build --pdf` and `tools/build.py pdf` both give a clean PDF without post-processing: boxes (admonitions) are breakable, shaded boxes; tables outside boxes break across pages and repeat their header row; figures are at most 55% of the text height, so a figure and its caption always fit on one page. MyST gives all table columns the same width. To set relative widths for the PDF, put a line with an inline raw LaTeX role just before the table, e.g. ``{raw:latex}`\tablecolumns{0.06,0.40,0.22,0.32}` `` (the website shows nothing for it, and `style.css` hides the empty paragraph; `tools/mystdocs.py` keeps it across the Claude Docs round trip, matched by the table's header row).
+- **Cross-references.** Every section heading carries a target (`(sec-4-2)=` before `### 4.2 ...`), and every mention of a section or figure is a link: `[Section 4.2](#sec-4-2)`, `Sections [4.3](#sec-4-3)–[4.5](#sec-4-5)`, `[Figure 2A](#fig-rules)`. On the website they are MyST cross-references; `tools/build.py pdf` turns them into LaTeX hyperlinks with the same text (plain `myst build --pdf` would drop the links and the panel letters). In Claude Docs they are plain text, and `tools/mystdocs.py from-docs` links them again automatically (figure numbers follow the order of the figures).
 - **Web-only prelude.** The version and DOI line, the graphical abstract and the contributors block at the top of `whitepaper.md` are marked `no-tex`/`no-pdf`; the PDF has them on its title page.
 - **Author line.** `myst.yml` names the author "White Paper by Tamas Spisak", which the website shows prominently. The PDF build prints just "Tamas Spisak".
 
@@ -55,7 +56,7 @@ used, because the LaTeX/PDF export drops them.
 npm install -g mystmd
 python3 tools/build.py          # live website preview while editing (myst start)
 python3 tools/build.py html     # static website in _build/html
-python3 tools/build.py pdf      # PDF -> exports/whitepaper.pdf (needs XeLaTeX and latexmk)
+python3 tools/build.py pdf      # PDF -> exports/whitepaper.pdf (needs XeLaTeX and latexmk); always build the PDF this way
 python3 tools/build.py all      # PDF, then the website with the PDF included
 python3 tools/build.py pdf --prepare-only   # only write the PDF source to _build/pdf/ for inspection
 ```
