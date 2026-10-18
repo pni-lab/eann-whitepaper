@@ -22,9 +22,10 @@ This repository builds the white paper with [MyST](https://mystmd.org) into
 | `myst.yml` | Project metadata (title, author, affiliations; keywords are metadata only and not printed) and site settings |
 | `source/claude-docs-export.md` | The raw markdown export from Claude Docs, the editing source |
 | `tools/build.py` | Builds the website (default: live preview) and the PDF, moving appendix boxes to the end for the PDF |
+| `tools/export_overview.py` | Exports the graphical abstract (`figures/overview.svg`) to `figures/overview.pdf` for the PDF build |
 | `tools/mystdocs.py` | Round trip between `whitepaper.md` and a two-tab Claude Docs document (main text and appendix boxes) |
 | `tools/docs2myst.py` | Former converter from a Claude Docs export (no longer used) |
-| `figures/overview.svg`, `figures/overview.pdf` | Graphical abstract: the SVG is the source and is used on the website; the PDF is a vector export of it for the LaTeX/PDF build (MyST picks the right one via `figures/overview.*`). After editing the SVG, re-export: `inkscape figures/overview.svg --export-type=pdf --export-filename=figures/overview.pdf` |
+| `figures/overview.svg`, `figures/overview.pdf` | Graphical abstract: the SVG is the source and is used on the website; the PDF wraps a lossless 4000-px raster of it for the LaTeX/PDF build (MyST picks the right one via `figures/overview.*`; a vector export rendered with blurry, thick lines in some PDF viewers). After editing the SVG, re-export with `python3 tools/export_overview.py` (needs Inkscape, Pillow and img2pdf) |
 | `_templates/arxiv-eann/` | The arXiv (NIPS-style) LaTeX template, adapted: compact title block with Fig. 1 on the title page (`title_figure` and `title_figure_caption` options), contributors block, status badges, Unicode symbols, unnumbered sections, page-safe boxes, tables and figures (see below), and a bibliography style without duplicate URLs (`plainnat-eann.bst`) |
 | `style.css` | Website styling for the status badges |
 | `.github/workflows/deploy.yml` | Builds the PDF and the website and deploys to GitHub Pages |

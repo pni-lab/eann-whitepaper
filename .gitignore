@@ -3,6 +3,7 @@ _build/
 tools/*
 !tools/build.py
 !tools/mystdocs.py
+!tools/export_overview.py
 source/
 node_modules/
 .DS_Store
