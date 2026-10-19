@@ -69,7 +69,7 @@ This white paper outlines a research programme grounded in such a framework. Its
 
 The programme is organized around three hypotheses, each tested in one line of work:
 
-**Matter can infer and learn (Line A, "Approach and theory").** At their most basic level, inference and learning are capabilities of suitably organized matter, rather than algorithms applied to it. Line A finalizes the unit-level theory and extends it to hierarchy, action, planning, as well as thermodynamic cost and implementability of emerging hardware.
+1. **Matter can infer and learn (Line A, "Approach and theory").** At their most basic level, inference and learning are capabilities of suitably organized matter, rather than algorithms applied to it. Line A finalizes the unit-level theory and extends it to hierarchy, action, planning, as well as thermodynamic cost and implementability of emerging hardware.
 
 2. **Biology exploits this across scales (Line B, "Brains").** Living systems use and exploit this fundamental from of inference across various scales and, therefore, show measurable signatures of it. Line B fits eANNs to fMRI data as generative models of large-scale brain dynamics, tests the theory, and investigates which computations are handled by large-scale attractors versus processes below them, using established neuroscientific and behavioral paradigms. The current programme presents learning, extinction, expectations, and pain modulation as focal points - not only because these yield an excellent testbed for our framework but also due to their fit to the authors current collaborative network. Extensions to other indications are not only possible, but desirable.
 
