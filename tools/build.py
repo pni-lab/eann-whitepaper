@@ -143,7 +143,7 @@ def prepare_pdf():
         for item in PDF_DIR.iterdir():
             if item.name != "_build":
                 shutil.rmtree(item) if item.is_dir() else item.unlink()
-    PDF_DIR.mkdir(exist_ok=True)
+    PDF_DIR.mkdir(parents=True, exist_ok=True)
     for name in COPY:
         src = ROOT / name
         if src.is_dir():
@@ -168,7 +168,7 @@ def build_pdf():
     if code != 0 or not built.exists():
         print("PDF build failed. LaTeX log, if any: _build/pdf/_build/temp/*/whitepaper.log")
         return code or 1
-    (ROOT / PDF_OUT).parent.mkdir(exist_ok=True)
+    (ROOT / PDF_OUT).parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(built, ROOT / PDF_OUT)
     cache = PDF_DIR / "_build" / "cache"
     if cache.exists():
