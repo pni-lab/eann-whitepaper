@@ -3,7 +3,7 @@ version: 1
 project:
   id: entropic-attractor-networks-whitepaper
   title: "Entropic attractor networks: a scale-agnostic, first-principles route to inference and learning in brains and machines"
-  subtitle: "White Paper v0.9.2 (draft)"
+  subtitle: "White Paper v0.9.3 (draft)"
   short_title: Entropic attractor networks
   description: >-
     White paper for a research programme on entropic attractor networks (eANNs):

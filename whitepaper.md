@@ -1,8 +1,8 @@
 ---
 title: "Entropic attractor networks: a scale-agnostic, first-principles route to inference and learning in brains and machines"
 short_title: "Entropic attractor networks"
-subtitle: "White Paper v0.9.2 (draft)"
-subject: "White Paper v0.9.2 (draft)"
+subtitle: "White Paper v0.9.3 (draft)"
+subject: "White Paper v0.9.3 (draft)"
 abstract: |
  Human brains learn continuously without erasing memories, represent uncertainty, and act on internal world models, all while running on roughly 20 watts. Current AI still struggles to match these capabilities. Neuroscience closely maps the underlying mechanisms but lacks a unifying framework that bridges disciplines and scales. A shared framework would benefit both fields: supplying AI with foundational design principles and giving neuroscience testable, scale-independent accounts applicable to brains and machines alike. This paper outlines a research programme built around such a framework. It posits that basic physical principles of inference and learning govern neural mechanisms, with brains merely refining their exploitation rather than inventing new rules.  From this perspective, cognition is not an algorithm imposed upon matter but the repeated, multi-scale utilization of appropriately organized matter’s inherent capacity to infer and learn. Central to this effort (Line A) is a formal theory of this capacity and a constructive path toward the emergent collective dynamics, called entropic attractor networks (eANNs). Rather than hand-crafted, eANNs emerge naturally, functioning as both generative models of brain dynamics and trainable stochastic networks. Early results support both roles. This enables us to validate and deploy the theory in the study of biological brains (Line B), harness its emergent properties in AI (Line C), and unify both domains under a single explanatory lens. Confirming our hypothesis would explain why key neural mechanisms take their observed forms and chart a principled route to human-like artificial intelligence.
 exports:
