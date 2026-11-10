@@ -32,7 +32,7 @@ project:
     - id: ude
       name: University Medicine Essen, University of Duisburg-Essen
   license: CC-BY-4.0
-  doi: 10.5281/zenodo.23187669
+  doi: 10.5281/zenodo.23484534
   downloads: 
     - file: exports/whitepaper.pdf
       title: Download as PDF
