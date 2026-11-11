@@ -284,7 +284,7 @@ def to_docs(src, outdir):
     text = Path(src).read_text()
     fm, rest = split_frontmatter(text)
     title = re.search(r'^title:\s*"(.*)"\s*$', fm, re.M).group(1)
-    abstract = re.search(r"^abstract: \|\n((?:  .*\n)+)", fm, re.M).group(1)
+    abstract = re.search(r"^abstract: \|\n((?: +.*\n)+)", fm, re.M).group(1)
     abstract = " ".join(l.strip() for l in abstract.splitlines())
     lines = rest.split("\n")
     start = next(i for i, l in enumerate(lines) if l.startswith("## ") or re.match(r"^:{3,}\{admonition\}", l) or re.match(r"^\(sec-[\w-]+\)=$", l))
@@ -484,7 +484,7 @@ def from_docs(main_md, boxes_md, dst):
     if title:
         fm = re.sub(r'^title:\s*".*"\s*$', "title: " + json.dumps(title, ensure_ascii=False), fm, count=1, flags=re.M)
     if abstract:
-        fm = re.sub(r"^abstract: \|\n(?:  .*\n)+", "abstract: |\n  " + abstract.replace("\\", "\\\\") + "\n", fm,
+        fm = re.sub(r"^abstract: \|\n(?: +.*\n)+", "abstract: |\n  " + abstract.replace("\\", "\\\\") + "\n", fm,
                     count=1, flags=re.M)
     out = fm + prelude.rstrip() + "\n\n" + body.strip() + "\n\n" + postlude.strip() + "\n"
     out = re.sub(r"\n{3,}", "\n\n", out)

@@ -47,7 +47,11 @@ project:
   toc:
     - file: whitepaper.md
 site:
-  template: article-theme
+  # Pinned to a known-good commit of myst-templates/article-theme (v1.4.1).
+  # The theme's main branch (Nov 2026) fails to prerender static files when
+  # BASE_URL is set ("No route matches URL /<repo>/_public/..."), which broke
+  # the GitHub Pages build. Update the hash deliberately, after a local test.
+  template: https://github.com/myst-templates/article-theme/archive/4acce1eba558b301c2aadca99a7804aa6e294e1e.zip
   options:
     logo_text: Entropic attractor networks
     style: ./style.css
