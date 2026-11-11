@@ -23,6 +23,13 @@ For the PDF, this script writes a transformed copy into _build/pdf/ in which
 It then runs `myst build --pdf` there and copies the result to
 exports/whitepaper.pdf. The source files are never modified.
 
+DOI metadata: MyST fetches every cited DOI from doi.org and caches it in
+_build/cache. A fresh checkout (e.g. on GitHub Actions) has no cache, and
+doi.org often rate-limits or returns malformed data there, which makes the
+build fail. The cache is therefore versioned in doi-cache/: it is restored
+into _build/cache before every build, and new valid entries are saved back.
+Commit doi-cache/ whenever it gains files.
+
 Usage:
     python3 tools/build.py            # live website preview (myst start)
     python3 tools/build.py html       # static website in _build/html
@@ -31,6 +38,7 @@ Usage:
     python3 tools/build.py pdf --prepare-only   # write _build/pdf/ only
 """
 
+import json
 import re
 import shutil
 import subprocess
@@ -41,6 +49,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE = "whitepaper.md"
 PDF_DIR = ROOT / "_build" / "pdf"  # inside _build, which MyST ignores
 PDF_OUT = Path("exports") / "whitepaper.pdf"
+DOI_CACHE = ROOT / "doi-cache"  # versioned copy of MyST's DOI metadata
 COPY = ["myst.yml", "references.bib", "style.css", "figures", "_templates"]
 
 OPEN = re.compile(r"^(:{3,})\{([\w-]+)\}\s*(.*)$")
@@ -138,6 +147,46 @@ def run(cmd, cwd):
     return subprocess.call(cmd, cwd=cwd)
 
 
+def _valid_csl(path):
+    try:
+        data = json.loads(path.read_text())
+    except (ValueError, OSError):
+        return False
+    items = data if isinstance(data, list) else [data]
+    return bool(items) and all(isinstance(i, dict) and i.get("title") for i in items)
+
+
+def restore_doi_cache(build_root):
+    """Copy doi-cache/*.csl.json into <build_root>/_build/cache."""
+    if not DOI_CACHE.is_dir():
+        return
+    dest = build_root / "_build" / "cache"
+    dest.mkdir(parents=True, exist_ok=True)
+    n = 0
+    for f in DOI_CACHE.glob("doi-*.csl.json"):
+        target = dest / f.name
+        if not target.exists() or not _valid_csl(target):
+            shutil.copy2(f, target)
+            n += 1
+    print(f"DOI cache: restored {n} entries into {dest.relative_to(ROOT)}/")
+
+
+def save_doi_cache(build_root):
+    """Copy new, valid DOI entries from <build_root>/_build/cache into doi-cache/."""
+    src = build_root / "_build" / "cache"
+    if not src.is_dir():
+        return
+    DOI_CACHE.mkdir(exist_ok=True)
+    new = 0
+    for f in src.glob("doi-*.csl.json"):
+        target = DOI_CACHE / f.name
+        if not target.exists() and _valid_csl(f):
+            shutil.copy2(f, target)
+            new += 1
+    if new:
+        print(f"DOI cache: saved {new} new entries to doi-cache/ (commit them)")
+
+
 def prepare_pdf():
     if PDF_DIR.exists():  # keep _build (DOI cache), refresh everything else
         for item in PDF_DIR.iterdir():
@@ -153,6 +202,7 @@ def prepare_pdf():
     main_cache = ROOT / "_build" / "cache"
     if main_cache.exists():
         shutil.copytree(main_cache, PDF_DIR / "_build" / "cache", dirs_exist_ok=True)
+    restore_doi_cache(PDF_DIR)
     (PDF_DIR / "myst.yml").write_text(pdf_myst_yml((ROOT / "myst.yml").read_text()))
     md, apps = to_pdf_markdown((ROOT / SOURCE).read_text())
     (PDF_DIR / SOURCE).write_text(md)
@@ -164,6 +214,7 @@ def prepare_pdf():
 def build_pdf():
     prepare_pdf()
     code = run(["myst", "build", "--pdf"], PDF_DIR)
+    save_doi_cache(PDF_DIR)
     built = PDF_DIR / PDF_OUT
     if code != 0 or not built.exists():
         print("PDF build failed. LaTeX log, if any: _build/pdf/_build/temp/*/whitepaper.log")
@@ -177,12 +228,20 @@ def build_pdf():
     return 0
 
 
+def build_html():
+    restore_doi_cache(ROOT)
+    code = run(["myst", "build", "--html"], ROOT)
+    save_doi_cache(ROOT)
+    return code
+
+
 def main(argv):
     target = argv[1] if len(argv) > 1 else "start"
     if target == "start":
+        restore_doi_cache(ROOT)
         return run(["myst", "start"], ROOT)
     if target == "html":
-        return run(["myst", "build", "--html"], ROOT)
+        return build_html()
     if target == "pdf":
         if "--prepare-only" in argv:
             prepare_pdf()
@@ -192,7 +251,7 @@ def main(argv):
         code = build_pdf()
         if code:
             return code
-        code = run(["myst", "build", "--html"], ROOT)
+        code = build_html()
         if code == 0:
             shutil.copy2(ROOT / PDF_OUT, ROOT / "_build" / "html" / "whitepaper.pdf")
         return code
